@@ -5,6 +5,7 @@ import sequelize from './config/database';
 import userRoutes from './routes/userRoutes';
 import offerRoutes from './routes/offerRoutes';
 import transactionRoutes from './routes/transactionRoutes';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.get('/', (req: Request, res: Response) => {
       users: '/api/users',
       offers: '/api/offers',
       transactions: '/api/transactions',
+      auth: '/api/auth'
     }
   });
 });
@@ -28,6 +30,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/users', userRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/auth', authRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Global error handler:', err);

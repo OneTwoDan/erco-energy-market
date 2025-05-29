@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction  } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import User from '../models/User';
+import bcrypt from 'bcryptjs';
 
 export const getUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -33,9 +34,22 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 
 export const createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { name, email, ...rest } = req.body;
-    const newUser = await User.create({ name, email, ...rest });
-    res.status(201).json(newUser);
+    const { name, email, password, ...rest } = req.body;
+    if (!name || !email || !password) {
+      res.status(400).json({ error: 'Name, email and password are required' });
+      return;
+    }
+
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      res.status(409).json({ error: 'Email already in use' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({ name, email, password: hashedPassword, ...rest });
+    res.status(201).json({ id: newUser.id, name: newUser.name, email: newUser.email });
   } catch (error) {
     next(error);
   }
