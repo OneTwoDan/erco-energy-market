@@ -1,4 +1,5 @@
 import express from 'express';
+import { authenticateToken } from '../middlewares/authMiddleware';
 import {
   getOffers,
   getOfferById,
@@ -11,8 +12,9 @@ const router = express.Router();
 
 router.get('/', getOffers);
 router.get('/:id', getOfferById);
-router.post('/', createOffer);
-router.put('/:id', updateOffer);
-router.delete('/:id', deleteOffer);
+
+router.post('/', authenticateToken, createOffer);
+router.put('/:id', authenticateToken, updateOffer);
+router.delete('/:id', authenticateToken, deleteOffer);
 
 export default router;
