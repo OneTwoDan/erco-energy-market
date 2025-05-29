@@ -42,3 +42,48 @@ export const createTransaction = async (
     next(error);
   }
 };
+
+export const getUserPurchases = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized: User not authenticated' });
+      return;
+    }
+
+    const userId = req.user.id;
+
+    const purchases = await Transaction.findAll({
+      where: { buyerId: userId },
+      include: [{ model: Offer, as: 'offer' }],
+      order: [['transactionDate', 'DESC']],
+    });
+
+    res.json(purchases);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserSales = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized: User not authenticated' });
+      return;
+    }
+
+    const userId = req.user.id;
+
+    const sales = await Transaction.findAll({
+      include: [{
+        model: Offer,
+        as: 'offer',
+        where: { sellerId: userId },
+      }],
+      order: [['transactionDate', 'DESC']],
+    });
+
+    res.json(sales);
+  } catch (error) {
+    next(error);
+  }
+};
