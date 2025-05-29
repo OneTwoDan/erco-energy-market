@@ -1,51 +1,64 @@
 import { Request, Response, NextFunction } from 'express';
+import { Transaction as SequelizeTransaction } from 'sequelize';
 import { Transaction, Offer } from '../models';
+import sequelize from '../config/database';
 
 export const createTransaction = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const { buyerId, offerId } = req.body;
+
+  if (!buyerId || !offerId) {
+    res.status(400).json({ message: 'buyerId and offerId are required' });
+    return;
+  }
+
   try {
-    const { buyerId, offerId } = req.body;
+    await sequelize.transaction(async (t: SequelizeTransaction) => {
+      const offer = await Offer.findOne({
+        where: { id: offerId },
+        lock: t.LOCK.UPDATE,
+        transaction: t,
+      });
 
-    if (!buyerId || !offerId) {
-      res.status(400).json({ message: 'buyerId and offerId are required' });
-      return;
-    }
+      if (!offer) {
+        res.status(404).json({ message: 'Offer not found' });
+        throw new Error('Rollback');
+      }
 
-    const offer = await Offer.findByPk(offerId);
+      if (offer.isSold) {
+        res.status(400).json({ message: 'Offer is already sold' });
+        throw new Error('Rollback');
+      }
 
-    if (!offer) {
-      res.status(404).json({ message: 'Offer not found' });
-      return;
-    }
+      const now = new Date();
+      if (now < offer.startDate || now > offer.endDate) {
+        res.status(400).json({ message: 'Offer is not within the valid time window' });
+        throw new Error('Rollback');
+      }
 
-    if (offer.isSold) {
-      res.status(400).json({ message: 'Offer is already sold' });
-      return;
-    }
+      const totalPrice = offer.pricePerKwh * offer.quantity;
 
-    const now = new Date();
-    if (now < offer.startDate || now > offer.endDate) {
-      res.status(400).json({ message: 'Offer is not within the valid time window' });
-      return;
-    }
+      const transaction = await Transaction.create(
+        {
+          buyerId,
+          offerId,
+          transactionDate: now,
+          totalPrice,
+        },
+        { transaction: t }
+      );
 
-    const totalPrice = offer.pricePerKwh * offer.quantity;
+      await offer.update({ isSold: true }, { transaction: t });
 
-    const transaction = await Transaction.create({
-      buyerId,
-      offerId,
-      transactionDate: now,
-      totalPrice,
+      res.status(201).json(transaction);
     });
-
-    await offer.update({ isSold: true });
-
-    res.status(201).json(transaction);
   } catch (error) {
-    next(error);
+    if (error instanceof Error && error.message !== 'Rollback') {
+      next(error);
+    }
   }
 };
 
