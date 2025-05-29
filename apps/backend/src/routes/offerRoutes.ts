@@ -3,6 +3,7 @@ import { authenticateToken } from '../middlewares/authMiddleware';
 import {
   getOffers,
   getOfferById,
+  getActiveOffers,
   createOffer,
   updateOffer,
   deleteOffer,
@@ -10,6 +11,7 @@ import {
 
 const router = express.Router();
 
+router.get('/active', getActiveOffers);
 router.get('/', getOffers);
 router.get('/:id', getOfferById);
 

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import Offer from '../models/Offer';
 
 export const getOffers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -81,6 +82,25 @@ export const deleteOffer = async (req: Request, res: Response, next: NextFunctio
     }
 
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getActiveOffers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const now = new Date();
+
+    const offers = await Offer.findAll({
+      where: {
+        isSold: false,
+        startDate: { [Op.lte]: now },
+        endDate: { [Op.gte]: now },
+      },
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json(offers);
   } catch (error) {
     next(error);
   }

@@ -26,12 +26,18 @@ export const createTransaction = async (
       return;
     }
 
+    const now = new Date();
+    if (now < offer.startDate || now > offer.endDate) {
+      res.status(400).json({ message: 'Offer is not within the valid time window' });
+      return;
+    }
+
     const totalPrice = offer.pricePerKwh * offer.quantity;
 
     const transaction = await Transaction.create({
       buyerId,
       offerId,
-      transactionDate: new Date(),
+      transactionDate: now,
       totalPrice,
     });
 
