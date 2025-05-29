@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import Offer from '../models/Offer';
+import { Offer, User } from '../models';
 
 export const getOffers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -87,6 +87,10 @@ export const deleteOffer = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+type OfferWithSeller = typeof Offer.prototype & {
+  seller?: { name: string };
+};
+
 export const getActiveOffers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const now = new Date();
@@ -97,10 +101,30 @@ export const getActiveOffers = async (req: Request, res: Response, next: NextFun
         startDate: { [Op.lte]: now },
         endDate: { [Op.gte]: now },
       },
+      include: [
+        {
+          model: User,
+          as: 'seller',
+          attributes: ['name'],
+        },
+      ],
       order: [['createdAt', 'DESC']],
-    });
+    }) as OfferWithSeller[];
 
-    res.json(offers);
+    const formattedOffers = offers.map((offer) => ({
+      id: offer.id,
+      sellerId: offer.sellerId,
+      sellerName: offer.seller?.name ?? 'Unknown',
+      quantity: offer.quantity,
+      pricePerKwh: offer.pricePerKwh,
+      startDate: offer.startDate,
+      endDate: offer.endDate,
+      isSold: offer.isSold,
+      createdAt: offer.createdAt,
+      updatedAt: offer.updatedAt,
+    }));
+
+    res.json(formattedOffers);
   } catch (error) {
     next(error);
   }
