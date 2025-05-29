@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import sequelize from './config/database';
 
 import userRoutes from './routes/userRoutes';
@@ -13,6 +14,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+}));
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ 
