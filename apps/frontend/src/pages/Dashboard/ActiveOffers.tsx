@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { OfferCard } from "@/components/cards/OfferCard";
+import SearchBar from "@/components/searchBar/SearchBar";
 import loadingGif from '@/assets/loading.gif';
 
 interface Offer {
@@ -16,6 +17,7 @@ interface Offer {
 const ActiveOffers = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchOffers = async () => {
     try {
@@ -87,6 +89,10 @@ const ActiveOffers = () => {
     }
   };
 
+  const filteredOffers = offers.filter((offer) =>
+    offer.sellerName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) return (
     <div className="flex justify-center items-center">
       <img src={loadingGif} alt="Loading..." />
@@ -94,15 +100,18 @@ const ActiveOffers = () => {
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {offers.map((offer) => (
-        <OfferCard
-          key={offer.id}
-          {...offer}
-          onBuy={() => handleBuy(offer.id, offer.sellerId)}
-        />
-      ))}
-    </div>
+    <>
+      <SearchBar onSearch={setSearchTerm} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredOffers.map((offer) => (
+          <OfferCard
+            key={offer.id}
+            {...offer}
+            onBuy={() => handleBuy(offer.id, offer.sellerId)}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
