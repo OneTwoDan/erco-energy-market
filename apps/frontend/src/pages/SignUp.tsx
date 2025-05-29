@@ -1,9 +1,10 @@
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import ERCO from "@/assets/ERCO.png";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -14,38 +15,53 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <h1 className="text-2xl font-semibold text-center">Sign Up</h1>
+    <div className="flex items-center justify-center min-h-screen bg-[#f9fdf3]">
+      <Card className="w-full max-w-md shadow-lg border border-[#a7da01] rounded-3xl">
+        <CardHeader className="flex flex-col items-center gap-4 pb-4 border-b border-[#a7da01]">
+          <img src={ERCO} alt="ERCP Logo" className="w-24 object-contain" />
+          <h1 className="text-3xl font-bold text-[#05b305]">Sign Up</h1>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-[#161616] font-semibold">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-[#a7da01] focus:border-[#05b305] focus:ring-[#05b305]"
               />
             </div>
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[#161616] font-semibold">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="border-[#a7da01] focus:border-[#05b305] focus:ring-[#05b305]"
               />
             </div>
-            <Button type="submit" className="w-full">Register</Button>
+            <Button
+              type="submit"
+              className="w-full bg-[#05b305] hover:bg-[#a7da01] text-white font-semibold"
+            >
+              Register
+            </Button>
           </form>
-          <p className="text-sm text-center mt-4">
+          <p className="text-sm text-center mt-6 text-[#161616]">
             Already have an account?{" "}
-            <Link to="/sign-in" className="text-blue-600 hover:underline">
+            <Link
+              to="/sign-in"
+              className="text-[#05b305] hover:text-[#a7da01] hover:underline"
+            >
               Sign In
             </Link>
           </p>
