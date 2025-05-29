@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Transaction as SequelizeTransaction } from 'sequelize';
-import { Transaction, Offer } from '../models';
+import { Transaction, Offer, User } from '../models';
 import sequelize from '../config/database';
 
 export const createTransaction = async (
@@ -73,7 +73,19 @@ export const getUserPurchases = async (req: Request, res: Response, next: NextFu
 
     const purchases = await Transaction.findAll({
       where: { buyerId: userId },
-      include: [{ model: Offer, as: 'offer' }],
+      include: [
+        {
+          model: Offer,
+          as: 'offer',
+          include: [
+            {
+              model: User,
+              as: 'seller',
+              attributes: ['id', 'name'],
+            }
+          ]
+        }
+      ],
       order: [['transactionDate', 'DESC']],
     });
 
@@ -93,11 +105,19 @@ export const getUserSales = async (req: Request, res: Response, next: NextFuncti
     const userId = req.user.id;
 
     const sales = await Transaction.findAll({
-      include: [{
-        model: Offer,
-        as: 'offer',
-        where: { sellerId: userId },
-      }],
+      where: {},
+      include: [
+        {
+          model: Offer,
+          as: 'offer',
+          where: { sellerId: userId },
+        },
+        {
+          model: User,
+          as: 'buyer',
+          attributes: ['id', 'name'],
+        }
+      ],
       order: [['transactionDate', 'DESC']],
     });
 
