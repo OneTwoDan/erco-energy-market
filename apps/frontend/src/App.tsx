@@ -1,12 +1,7 @@
-import { Button } from "@/components/ui/button"
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 function App() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      ERCO ENERGY MARKET
-      <Button>Login</Button>
-    </div>
-  )
+  return <DashboardLayout />;
 }
 
-export default App
+export default App;
