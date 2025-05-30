@@ -1,12 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import sequelize from '../src/config/database';
+import sequelize from './src/config/database';
 
-import userRoutes from '../src/routes/userRoutes';
-import offerRoutes from '../src/routes/offerRoutes';
-import transactionRoutes from '../src/routes/transactionRoutes';
-import authRoutes from '../src/routes/authRoutes';
+import userRoutes from './src/routes/userRoutes';
+import offerRoutes from './src/routes/offerRoutes';
+import transactionRoutes from './src/routes/transactionRoutes';
+import authRoutes from './src/routes/authRoutes';
 
 dotenv.config();
 
