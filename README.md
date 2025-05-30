@@ -63,7 +63,12 @@ npm run dev
 
 ## Uso
 
-- Registrarse o iniciar sesión  
+- Registrarse o iniciar sesión
+```bash
+Cuenta Test
+  test-user@mail.com
+  test123!
+```
 - Usuarios pueden crear ofertas con cantidad, precio y ventana de tiempo  
 - Usuarios ven ofertas activas en tiempo real y pueden comprar solo una oferta válida  
 - Historial de transacciones disponible para cada usuario  
